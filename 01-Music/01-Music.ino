@@ -6,6 +6,7 @@
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1 
 #define SPEAKER_PIN 4 // PC speaker connected to D4
+#define LED_PIN 13 // Built-in LED
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
@@ -31,11 +32,6 @@ const int korobeiniki[] PROGMEM = {
   NOTE_E5, 4,  NOTE_B4, 8,  NOTE_C5, 8,  NOTE_D5, 4,  NOTE_C5, 8,  NOTE_B4, 8,
   NOTE_A4, 4,  NOTE_A4, 8,  NOTE_C5, 8,  NOTE_E5, 4,  NOTE_D5, 8,  NOTE_C5, 8,
   NOTE_B4, -4, NOTE_C5, 8,  NOTE_D5, 4,  NOTE_E5, 4,
-  NOTE_C5, 4,  NOTE_A4, 4,  NOTE_A4, 8,  NOTE_A4, 4,  NOTE_B4, 8,  NOTE_C5, 8,
-
-  NOTE_D5, -4, NOTE_F5, 8,  NOTE_A5, 4,  NOTE_G5, 8,  NOTE_F5, 8,
-  NOTE_E5, -4, NOTE_C5, 8,  NOTE_E5, 4,  NOTE_D5, 8,  NOTE_C5, 8,
-  NOTE_B4, 4,  NOTE_B4, 8,  NOTE_C5, 8,  NOTE_D5, 4,  NOTE_E5, 4,
   NOTE_C5, 4,  NOTE_A4, 4,  NOTE_A4, 4,  REST, 4
 };
 
@@ -71,6 +67,7 @@ int currentSong = 0; // State variable to toggle songs
 
 void setup() {
   Serial.begin(9600);
+  pinMode(LED_PIN, OUTPUT);
 
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
     Serial.println(F("SSD1306 allocation failed - check wiring!"));
@@ -131,8 +128,12 @@ void playMelody(const int *melody, int numNotes, int tempo) {
       noteDuration *= 1.5; 
     }
 
+    if (noteFreq != REST) {
+      digitalWrite(LED_PIN, HIGH);
+    }
     tone(SPEAKER_PIN, noteFreq, noteDuration * 0.9);
     delay(noteDuration);
+    digitalWrite(LED_PIN, LOW);
     noTone(SPEAKER_PIN);
   }
 }
