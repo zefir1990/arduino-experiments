@@ -62,7 +62,6 @@ uint8_t currentRotation;
 uint8_t nextPiece;
 int8_t pieceX;
 int8_t pieceY;
-uint16_t score;
 uint16_t clearedLines;
 uint8_t level;
 bool gameOver;
@@ -229,6 +228,19 @@ void drawHUD()
       }
     }
   }
+
+  uint8_t linesY = previewY + 4 * CELL + 10;
+
+  tft.fillRect(previewX, linesY, CELL * 5, 16, ST77XX_BLACK);
+
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setTextSize(1);
+
+  tft.setCursor(previewX, linesY);
+  tft.print("LINES");
+
+  tft.setCursor(previewX, linesY + 8);
+  tft.print(clearedLines);
 }
 
 
@@ -247,14 +259,10 @@ void showGameOver()
   tft.setTextSize(1);
 
   tft.setCursor(15, 80);
-  tft.print("SCORE: ");
-  tft.print(score);
-
-  tft.setCursor(15, 90);
   tft.print("LEVEL: ");
   tft.print(level);
 
-  tft.setCursor(15, 100);
+  tft.setCursor(15, 90);
   tft.print("LINES: ");
   tft.print(clearedLines);
 }
@@ -344,7 +352,7 @@ void spawnPiece()
 
 
 
-void updateScore(uint8_t linesCleared)
+void updateClearedLines(uint8_t linesCleared)
 {
   if (linesCleared == 0)
     return;
@@ -353,10 +361,6 @@ void updateScore(uint8_t linesCleared)
   level = clearedLines / 10;
 
   fallInterval = max((unsigned long)100, (unsigned long)(500 - level * 40));
-
-  const uint16_t lineScores[] = {0, 40, 100, 300, 1200};
-
-  score += lineScores[linesCleared] * (level + 1);
 }
 
 
@@ -372,7 +376,7 @@ void tick()
 
     uint8_t cleared = clearFullLines();
 
-    updateScore(cleared);
+    updateClearedLines(cleared);
 
     if (cleared > 0)
     {
@@ -408,14 +412,13 @@ void hardDrop()
   while (!checkCollision(currentPiece, currentRotation, pieceX, pieceY + 1))
   {
     pieceY++;
-    score++;
   }
 
   lockPiece();
 
   uint8_t cleared = clearFullLines();
 
-  updateScore(cleared);
+  updateClearedLines(cleared);
 
   if (cleared > 0)
   {
@@ -499,7 +502,6 @@ void restartGame()
     }
   }
 
-  score = 0;
   clearedLines = 0;
   level = 0;
   fallInterval = 500;
