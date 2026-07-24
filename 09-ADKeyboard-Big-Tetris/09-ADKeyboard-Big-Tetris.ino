@@ -277,7 +277,7 @@ void drawTitleScreen()
   tft.setTextColor(ST77XX_CYAN);
   tft.setTextSize(2);
 
-  tft.setCursor(8, 50);
+  tft.setCursor(6, 50);
   tft.print(F("BIG TETRIS"));
 
   tft.setTextColor(ST77XX_WHITE);
@@ -285,6 +285,12 @@ void drawTitleScreen()
 
   tft.setCursor(25, 90);
   tft.print(F("PRESS ANY KEY"));
+
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setTextSize(1);
+
+  tft.setCursor(10, 115);
+  tft.print(F("DEMENSDEUM.COM 2026"));
 }
 
 
@@ -404,7 +410,7 @@ void updateClearedLines(uint8_t linesCleared)
   clearedLines += linesCleared;
   level = clearedLines / 10;
 
-  fallInterval = max(100, 500 - level * 40);
+  fallInterval = max(100, 1000 - level * 80);
 }
 
 
@@ -548,7 +554,7 @@ void restartGame()
 
   clearedLines = 0;
   level = 0;
-  fallInterval = 500;
+  fallInterval = 1000;
   gameOver = false;
 
   tft.fillScreen(ST77XX_BLACK);
@@ -707,7 +713,7 @@ void loop()
 
   if (gameOver)
   {
-    if (millis() - gameOverTime < 1000)
+    if (millis() - gameOverTime < 3000)
     {
       previousKey = currentKey;
       return;
