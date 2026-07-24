@@ -2,6 +2,8 @@
 
 A progressive series of Arduino sketches exploring display drivers, IR remote control, sound output, and interactive games. Built for Arduino Uno / Nano with common breakout modules.
 
+![Cover](cover.jpg)
+
 ## Hardware
 
 All projects use one or more of the following components:

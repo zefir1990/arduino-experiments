@@ -32,8 +32,8 @@ Adafruit_ST7735 tft(TFT_CS, TFT_DC, 11, 13, TFT_RST);
 #define KEY_MAX_UP 166
 #define KEY_MIN_DOWN 335
 #define KEY_MAX_DOWN 346
-#define KEY_MIN_LEFT 12
-#define KEY_MAX_LEFT 25
+#define KEY_MIN_LEFT 5
+#define KEY_MAX_LEFT 40
 #define KEY_MIN_SELECT 744
 #define KEY_MAX_SELECT 748
 
