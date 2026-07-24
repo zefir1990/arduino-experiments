@@ -37,8 +37,13 @@ Adafruit_ST7735 tft(TFT_CS, TFT_DC, 11, 13, TFT_RST);
 #define KEY_MIN_SELECT 744
 #define KEY_MAX_SELECT 748
 
+#define KEY_DEBOUNCE_SAMPLES 3
+
 uint8_t gridOffsetY;
 uint8_t previousKey;
+uint8_t debouncedKey;
+uint8_t candidateKey;
+uint8_t candidateCount;
 
 const uint8_t PIECE_SHAPES[PIECE_COUNT][4][4] PROGMEM = {
   {{0b0000, 0b1111, 0b0000, 0b0000},
@@ -591,6 +596,33 @@ int readKey()
 
 
 
+int readDebouncedKey()
+{
+  int currentKey = readKey();
+
+  if (currentKey == candidateKey)
+  {
+    if (candidateCount < KEY_DEBOUNCE_SAMPLES)
+    {
+      candidateCount++;
+    }
+
+    if (candidateCount >= KEY_DEBOUNCE_SAMPLES)
+    {
+      debouncedKey = currentKey;
+    }
+  }
+  else
+  {
+    candidateKey = currentKey;
+    candidateCount = 1;
+  }
+
+  return debouncedKey;
+}
+
+
+
 void handleADKeyboard(int currentKey)
 {
   switch (currentKey)
@@ -644,6 +676,10 @@ void setup()
 
   randomSeed(analogRead(A0));
 
+  debouncedKey = KEY_NONE;
+  candidateKey = KEY_NONE;
+  candidateCount = 0;
+
   titleScreen = true;
   drawTitleScreen();
 }
@@ -652,7 +688,7 @@ void setup()
 
 void loop()
 {
-  int currentKey = readKey();
+  int currentKey = readDebouncedKey();
   bool keyJustPressed = currentKey != KEY_NONE && previousKey == KEY_NONE;
 
   if (titleScreen)
