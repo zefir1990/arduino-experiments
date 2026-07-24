@@ -15,10 +15,11 @@ Adafruit_ST7735 tft(TFT_CS, TFT_DC, 11, 13, TFT_RST);
 #define GRID_WIDTH 10
 #define GRID_HEIGHT 20
 #define GRID_X ((128 - GRID_WIDTH * CELL) / 2)
-#define GRID_Y ((160 - GRID_HEIGHT * CELL) / 2)
 #define GRID_PIXEL_WIDTH (GRID_WIDTH * CELL)
 #define GRID_PIXEL_HEIGHT (GRID_HEIGHT * CELL)
 #define PIECE_COUNT 7
+
+uint8_t gridOffsetY;
 
 const uint8_t PIECE_SHAPES[PIECE_COUNT][4][4] PROGMEM = {
   {{0b0000, 0b1111, 0b0000, 0b0000},
@@ -65,6 +66,7 @@ uint16_t score;
 uint16_t clearedLines;
 uint8_t level;
 bool gameOver;
+unsigned long gameOverTime;
 unsigned long lastFall;
 unsigned long fallInterval;
 
@@ -110,7 +112,7 @@ void drawBlock(uint8_t gridX, uint8_t gridY, uint16_t color)
 {
   tft.fillRect(
     GRID_X + gridX * CELL,
-    GRID_Y + gridY * CELL,
+    gridOffsetY + gridY * CELL,
     CELL,
     CELL,
     color
@@ -167,7 +169,7 @@ void drawBorder()
 {
   tft.drawRect(
     GRID_X - 1,
-    GRID_Y - 1,
+    gridOffsetY - 1,
     GRID_PIXEL_WIDTH + 2,
     GRID_PIXEL_HEIGHT + 2,
     ST77XX_WHITE
@@ -180,7 +182,7 @@ void redrawFullField()
 {
   tft.fillRect(
     GRID_X,
-    GRID_Y,
+    gridOffsetY,
     GRID_PIXEL_WIDTH,
     GRID_PIXEL_HEIGHT,
     ST77XX_BLACK
@@ -208,7 +210,7 @@ void redrawFullField()
 void drawHUD()
 {
   uint8_t previewX = GRID_X + GRID_PIXEL_WIDTH + 5;
-  uint8_t previewY = GRID_Y + 5;
+  uint8_t previewY = gridOffsetY + 5;
 
   for (uint8_t row = 0; row < 4; row++)
   {
@@ -332,6 +334,7 @@ void spawnPiece()
   if (checkCollision(currentPiece, currentRotation, pieceX, pieceY))
   {
     gameOver = true;
+    gameOverTime = millis();
     showGameOver();
     return;
   }
@@ -377,7 +380,11 @@ void tick()
     }
 
     spawnPiece();
-    drawHUD();
+
+    if (!gameOver)
+    {
+      drawHUD();
+    }
   }
   else
   {
@@ -420,7 +427,11 @@ void hardDrop()
   }
 
   spawnPiece();
-  drawHUD();
+
+  if (!gameOver)
+  {
+    drawHUD();
+  }
 }
 
 
@@ -514,8 +525,6 @@ void handleIR()
   {
     if (gameOver)
     {
-      restartGame();
-
       IrReceiver.resume();
       return;
     }
@@ -557,6 +566,8 @@ void setup()
   tft.setRotation(1);
   tft.fillScreen(ST77XX_BLACK);
 
+  gridOffsetY = (tft.height() - GRID_PIXEL_HEIGHT) / 2;
+
   randomSeed(analogRead(A0));
 
   IrReceiver.begin(IR_PIN, DISABLE_LED_FEEDBACK);
@@ -570,7 +581,17 @@ void loop()
 {
   handleIR();
 
-  if (!gameOver && millis() - lastFall > fallInterval)
+  if (gameOver)
+  {
+    if (millis() - gameOverTime > 5000)
+    {
+      restartGame();
+    }
+
+    return;
+  }
+
+  if (millis() - lastFall > fallInterval)
   {
     lastFall = millis();
     tick();
