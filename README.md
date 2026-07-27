@@ -11,8 +11,9 @@ All projects use one or more of the following components:
 | Component | Pins | Used in |
 |---|---|---|
 | SSD1306 128×64 OLED (I2C) | SDA/A4, SCL/A5 | 00, 01 |
-| ST7735S 1.8" TFT (SPI) | CS 10, DC 9, RST 8, MOSI 11, SCK 13 | 02–07 |
-| IR Receiver (NEC) | D2 | 03–07 |
+| ST7735S 1.8" TFT (SPI) | CS 10, DC 9, RST 8, MOSI 11, SCK 13 | 02–10 |
+| IR Receiver (NEC) | D2 | 03–08 |
+| AD Keyboard (resistive divider) | A0 | 09, 10 |
 | Piezo Speaker | D4 | 01 |
 
 ## Projects
@@ -67,6 +68,28 @@ Full Tetris implementation on the TFT. Features 7 tetrominoes with 4 rotations e
 
 **Controls:** LEFT/RIGHT move, UP rotates, DOWN hard drops. Game restarts after 5 seconds on game over.
 
+### 08 — Big Tetris (IR)
+
+A larger-scale Tetris with bigger 7px cells on a 10×20 grid. Features 7 tetrominoes stored in PROGMEM, next-piece preview, HUD with line count, progressive speed increase, and title screen.
+
+**Hardware:** ST7735S TFT, IR Receiver D2
+
+**Controls:** LEFT/RIGHT move, UP rotates, DOWN hard drops.
+
+### 09 — Big Tetris (AD Keyboard)
+
+Same Big Tetris gameplay as 08 but controlled via a resistive-divider AD keyboard on A0. Includes software debouncing over 3 ADC samples for reliable input.
+
+**Hardware:** ST7735S TFT, AD Keyboard A0
+
+**Controls:** LEFT/RIGHT move, SELECT rotates, DOWN hard drops.
+
+### 10 — AD Keyboard Calibrator
+
+A calibration tool for the resistive-divider AD keyboard. Displays the raw analog value and identified key (RIGHT, UP, DOWN, LEFT, SELECT) in real time. Use this to determine threshold values for projects 09.
+
+**Hardware:** ST7735S TFT, AD Keyboard A0
+
 ## IR Remote Codes
 
 The projects use an NEC IR remote with the following command mapping:
@@ -81,19 +104,20 @@ The projects use an NEC IR remote with the following command mapping:
 ## Wiring
 
 ```
-Arduino         SSD1306 OLED      ST7735S TFT      IR Receiver     Speaker
-------          -------------     ------------      -----------     -------
-5V              VCC               VCC               VCC             5V
-GND             GND               GND               GND             GND
+Arduino         SSD1306 OLED      ST7735S TFT      IR Receiver     AD Keyboard    Speaker
+------          -------------     ------------      -----------     -----------    -------
+5V              VCC               VCC               VCC             VCC            5V
+GND             GND               GND               GND             GND            GND
 A4 (SDA)        SDA
 A5 (SCL)        SCL
+A0                                                                    OUT
 D10                               CS
 D9                                DC
 D8                                RST
 D11                              MOSI
 D13                              SCK
 D2                                                  OUT
-D4                                                                   Positive
+D4                                                                                  Positive
 D13               LED (via resistor)
 ```
 
