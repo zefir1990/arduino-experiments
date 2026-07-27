@@ -26,18 +26,18 @@ Adafruit_ST7735 tft(TFT_CS, TFT_DC, 11, 13, TFT_RST);
 #define KEY_LEFT 4
 #define KEY_SELECT 5
 
-#define KEY_MIN_RIGHT 510
-#define KEY_MAX_RIGHT 520
-#define KEY_MIN_UP 152
-#define KEY_MAX_UP 166
-#define KEY_MIN_DOWN 335
-#define KEY_MAX_DOWN 346
-#define KEY_MIN_LEFT 5
-#define KEY_MAX_LEFT 40
-#define KEY_MIN_SELECT 744
-#define KEY_MAX_SELECT 748
+#define KEY_MIN_RIGHT 500
+#define KEY_MAX_RIGHT 510
+#define KEY_MIN_UP 140
+#define KEY_MAX_UP 150
+#define KEY_MIN_DOWN 330
+#define KEY_MAX_DOWN 340
+#define KEY_MIN_LEFT 0
+#define KEY_MAX_LEFT 10
+#define KEY_MIN_SELECT 740
+#define KEY_MAX_SELECT 750
 
-#define KEY_DEBOUNCE_SAMPLES 3
+#define KEY_DEBOUNCE_SAMPLES 4
 
 uint8_t gridOffsetY;
 uint8_t previousKey;
